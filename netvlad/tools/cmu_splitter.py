@@ -46,7 +46,6 @@ def netvlad_gen_dataset(data_id, splits_d, whichSet):
                 img_v = img_v[np.arange(0,img_num,2)]
                 pose_v = pose_v[np.arange(0,img_num,2),:]
 
-                print(img_v.shape)
                 fn_d[split].append(img_v)
                 utm_d[split].append(pose_v)
     

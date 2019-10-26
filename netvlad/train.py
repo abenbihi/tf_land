@@ -17,6 +17,7 @@ netvlad_ckpt_dir = 'meta/weights/netvlad_tf_open/vd16_pitts30k_conv5_3_vlad_preL
 
 
 def update_cache(sess, q_img_op, q_des_cst_op, img_dataset, cache_fn):
+    """Update the cached image representation with the latest network model."""
     cache_start_time = time.time()
     img_num = img_dataset.size()
     des_dim = q_des_cst_op.get_shape().as_list()[-1]
@@ -57,7 +58,7 @@ def train(args):
     train_log_dir = 'res/%d/log/train'%args.trial
     if not os.path.exists(train_log_dir):
         os.makedirs(train_log_dir)
-    cache_fn = 'res/%d/cache/train_feat_cache.hdf5'%args.trial
+    cache_fn = 'res/%d/cache/train_feat_cache.npy'%args.trial
 
     print('** Load data **')
     # train img (queries (q) and database (db))
@@ -71,7 +72,6 @@ def train(args):
     query_dataset = tools.data_loader.QueryDataset(args, train_dir, is_training,
             (img_num, des_dim), debug=False)
     print('# of train queries: %d' %query_dataset.size())
-
 
     # define network opts
     with tf.Graph().as_default():
@@ -94,9 +94,9 @@ def train(args):
         print('n_des_op.shape: ', n_des_op.get_shape())
         q_des_cst_op = tf.stop_gradient(q_des_op)
 
-        loss_op, loss_p_op, loss_n_op = tools.opttriplet_loss(args, q_des_op, p_des_op, n_des_op)
+        loss_op, loss_p_op, loss_n_op = tools.opt.triplet_loss(args, q_des_op, p_des_op, n_des_op)
         var_to_train_name = list(np.loadtxt('meta/var_to_train_netvlad.txt', dtype=str))
-        train_op = tools.opttrain(args, loss_op, global_step, var_to_train_name)
+        train_op = tools.opt.train(args, loss_op, global_step, var_to_train_name)
 
         # vars to init with paper weights
         var_to_init = []
@@ -195,14 +195,12 @@ def train(args):
                     #if step %10==0:
                     #    break # TODO: delete
                    
-
                 # Save model
                 summary_str = sess.run(summary_op,
                             feed_dict={q_img_op: q_img_v, p_img_op: p_img_v, n_img_op: n_img_v})
                 summary_writer.add_summary(summary_str, step)
                 checkpoint_path = os.path.join(train_log_dir, 'model.ckpt')
                 saver.save(sess, checkpoint_path, global_step=step)
-
             except Exception as e:  # pylint: disable=broad-except
                 coord.request_stop(e)
             
@@ -211,8 +209,7 @@ def train(args):
            
 
 if __name__=='__main__':
-    parser = argparse.ArgumentParser(description='pytorch-NetVlad')
-    
+    parser = argparse.ArgumentParser()
     parser.add_argument('--trial', type=int, required=True, help='Trial.')
 
     # dataset

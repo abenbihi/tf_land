@@ -45,7 +45,7 @@ slice and other datasets.
 Get the dataset (this can take some time, so go grab some coffee) and the meta
 data.
 ```bash
-cd netvlad/datasets/
+cd meta/data/cmu/
 ./Extended-CMU-Seasons.sh
 
 cd meta/data/cmu

@@ -20,7 +20,7 @@ if ! [ -d res/"$trial"/log/val/ ]; then
   mkdir -p res/"$trial"/log/val/
 fi
 
-split_dir=meta/data/cmu/surveys/
+split_dir=meta/data_splits/cmu/
 img_dir=meta/data/cmu/
 
 python3 val.py \

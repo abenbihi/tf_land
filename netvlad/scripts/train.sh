@@ -36,15 +36,19 @@ else
   mkdir -p "$log_dir";
 fi
 
-
-split_dir=meta/data/cmu/surveys/
+split_dir=meta/data_splits/cmu/
 img_dir=meta/data/cmu/
 
 python3 train.py \
   --trial "$trial" \
   --data_id "$data_id" \
   --mean_fn meta/mean_std.txt \
+  --split_dir "$split_dir" \
+  --img_dir "$img_dir" \
   --batch_size 3 \
+  --resize 1 \
+  --h 384 \
+  --w 512 \
   --N_nr 10 \
   --N_nh 3 \
   --num_clusters 64 \
@@ -58,9 +62,6 @@ python3 train.py \
   --weightDecay 0.001 \
   --num_epochs_per_decay 5 \
   --lr_decay_factor 0.5 \
-  --resize 1 \
-  --h 384 \
-  --w 512 \
   --seed 123 \
   --log_interval 50 \
   --summary_interval 200 \

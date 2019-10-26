@@ -24,7 +24,6 @@ class Metadata():
             dist_pos: maximum distance between matching db and q images.
             dist_non_neg: minimum distance between non-matching db and q imgs.
         """
-
         self.dbImage = np.loadtxt('%s/dbImage.txt'%split_dir, dtype=str)
         self.utmDb = np.loadtxt('%s/utmDb.txt'%split_dir)
         self.qImage = np.loadtxt('%s/qImage.txt'%split_dir, dtype=str)
