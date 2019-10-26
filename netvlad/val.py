@@ -1,22 +1,19 @@
-
+"""Evaluates the trained netvlad with recall@N and mAP."""
 import os, shutil, json, argparse, random, time
 from datetime import datetime
 import h5py
 import faiss
 
 import numpy as np
-
 import tensorflow as tf
 
-
-import lake as lake_dataset # dataloader
+import tools.data_loader # dataloader
 import tools.opt as opt # loss, optimiser
 from tools.model_netvlad import vgg16NetvladPca as net
 
 netvlad_ckpt_dir = 'meta/weights/netvlad_tf_open/vd16_pitts30k_conv5_3_vlad_preL2_intra_white'
 
 def val(args):
-    
     bz = args.batch_size
     new_size = (args.w, args.h)
     
@@ -25,20 +22,17 @@ def val(args):
     print('** Load data **')
     is_training = False
     val_dir = '%s/%d/val/'%(args.split_dir, args.data_id)
-    img_dataset = lake_dataset.ImageDataset(args, val_dir, is_training, onlyDB=False)
+    img_dataset = tools.data_loader.ImageDataset(args, val_dir, is_training, onlyDB=False)
     img_num = img_dataset.size()
     print('# val images: %d'%img_num)
 
-
     with tf.Graph().as_default():
-
         # define network operations graph
         img_op = tf.placeholder(dtype=tf.float32, shape=[bz, new_size[1], new_size[0], 3])
         tf.summary.image('img', img_op)
         des_op = net(img_op)
         print('img_op.shape: ', img_op.get_shape())
         print('des_op.shape: ', des_op.get_shape())
-
 
         # init netvlad with paper weights
         var_to_init = []
@@ -53,13 +47,11 @@ def val(args):
         variable_averages = tf.train.ExponentialMovingAverage(args.moving_average_decay)
         variables_to_restore = variable_averages.variables_to_restore()
         saver = tf.train.Saver(variables_to_restore)
-  
 
         # Set summary op, restore vars
         summary_op = tf.summary.merge_all()
         with tf.Session() as sess:
             sess.run(tf.global_variables_initializer())
-
             if args.no_finetuning == 1: # load model from pittsburg trainng
                 global_step = 0
                 print("Evaluate netvlad from the paper")

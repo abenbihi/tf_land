@@ -1,40 +1,20 @@
 #!/bin/sh
 
-
-MACHINE=2
-if [ "$MACHINE" -eq 0 ]; then
-  ws_dir=/home/abenbihi/ws/
-elif [ "$MACHINE" -eq 1 ]; then
-  ws_dir=/home/gpu_user/assia/ws/
-elif [ "$MACHINE" -eq 2 ]; then
-  ws_dir=/opt/BenbihiAssia/ws/
-else
-  echo "Error in train.sh: Get your MTF MACHINE macro correct"
-  exit 1
-fi
-
 if [ "$#" -eq 0 ]; then
   echo "1. trial"
   echo "2. data_id"
-  echo "3. lr"
   exit 0
 fi
 
-if [ "$#" -ne 3 ]; then
+if [ "$#" -ne 2 ]; then
   echo "Error: bad number of arguments"
   echo "1. trial"
   echo "2. data_id"
-  echo "3. lr"
   exit 1
 fi
 
 trial="$1"
 data_id="$2"
-lr="$3"
-
-#if ! [ -d res/"$trial"/cache/ ]; then
-#  mkdir -p res/"$trial"/cache/
-#fi
 
 log_dir=res/"$trial"/
 if [ -d "$log_dir" ]; then
@@ -56,17 +36,13 @@ else
   mkdir -p "$log_dir";
 fi
 
-#split_dir="$ws_dir"/life_saver/datasets/CMU-Seasons/meta/retrieval/
-#img_dir="$ws_dir"/datasets/Extended-CMU-Seasons/
 
-split_dir= "$ws_dir"/datasets/CMU-Seasons
-img_dir="$ws_dir"/datasets/Extended-CMU-Seasons
-#lr=0.0001
+split_dir=meta/data/cmu/surveys/
+img_dir=meta/data/cmu/
 
 python3 train.py \
   --trial "$trial" \
   --data_id "$data_id" \
-  --model alexnet \
   --mean_fn meta/mean_std.txt \
   --batch_size 3 \
   --N_nr 10 \
@@ -75,11 +51,8 @@ python3 train.py \
   --margin 1 \
   --n_epochs 30 \
   --C 1000 \
-  --lr "$lr" \
+  --lr 0.001 \
   --moving_average_decay 0.9999 \
-  --adam_b1 0.9 \
-  --adam_b2 0.999 \
-  --adam_eps 1e-8 \
   --optim SGD \
   --momentum 0.9 \
   --weightDecay 0.001 \

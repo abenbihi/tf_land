@@ -7,10 +7,9 @@ import time
 import h5py
 
 import numpy as np
-
 import tensorflow as tf
 
-import dataset.lake
+import tools.data_loader
 import tools.opt
 import tools.model_netvlad
 
@@ -64,12 +63,12 @@ def train(args):
     # train img (queries (q) and database (db))
     is_training = True
     train_dir = '%s/%d/train/'%(args.split_dir, args.data_id)
-    img_dataset = dataset.lake.ImageDataset(args, train_dir, is_training, onlyDB=False)
+    img_dataset = tools.data_loader.ImageDataset(args, train_dir, is_training, onlyDB=False)
     print('# train images: %d'%img_dataset.size())
     # train queries
     img_num = img_dataset.size()
     des_dim = 4096 # yeah, yeah bad hardcoding, I know
-    query_dataset = dataset.lake.QueryDataset(args, train_dir, is_training,
+    query_dataset = tools.data_loader.QueryDataset(args, train_dir, is_training,
             (img_num, des_dim), debug=False)
     print('# of train queries: %d' %query_dataset.size())
 
@@ -192,11 +191,6 @@ def train(args):
                             saver.save(sess, checkpoint_path, global_step=step)
                         current_epoch +=1
                         
-                        #loss_n, loss_p = sess.run([loss_p_op, loss_n_op],
-                        #    feed_dict={q_img_op: q_img_v, p_img_op: p_img_v, n_img_op: n_img_v})
-                        #print(loss_n)
-                        #print(loss_p)
-                    
                     ## debug
                     #if step %10==0:
                     #    break # TODO: delete
@@ -234,7 +228,6 @@ if __name__=='__main__':
     parser.add_argument('--N_nh', type=int, default=10, help='Number of hard negatives.')
    
     # optim 
-    parser.add_argument('--model', type=str, default='', help='{alexnet, vgg}')
     parser.add_argument('--num_clusters', type=int, default=64, help='Number of clusters')
     parser.add_argument('--margin', type=float, default=0.1, help='Margin for triplet loss. Default=0.1')
     parser.add_argument('--n_epochs', type=int, default=1000)

@@ -1,2 +1,6 @@
 *pyc
 __pycache__
+
+netvlad/meta/weights/netvlad_tf_open/
+netvlad/meta/data/cmu/surveys/
+netvlad/meta/data_splits/
