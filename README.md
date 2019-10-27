@@ -1,10 +1,10 @@
 Where all networks get tensorflowed.
 
 ## Models
-- Netvlad: 
-- Hed:
-- CaseNet: 
-- DeepGaze: 
-- SuperPoint: 
-- VGG: 
-- AlexNet:
+- Netvlad 
+- Hed
+- DeepGaze
+- SuperPoint
+- VGG
+- AlexNet
+- CaseNet (ongoing)
